@@ -1,4 +1,4 @@
-local t = require("./converter_types")
+local types = require("./converter_types")
 
 local function keys<T>(tbl: { [T]: any }): { T }
 	local result = {}
@@ -8,12 +8,12 @@ local function keys<T>(tbl: { [T]: any }): { T }
 	return result
 end
 
-local CONVERSION_DISPLAY: { [t.ConversionScope]: string } = {
+local CONVERSION_DISPLAY: { [types.ConversionScope]: string } = {
 	entire_game = "Entire Game",
 	selected_objects = "Selected Objects",
 }
 
-local SANDBOX_DISPLAY: { [t.SandboxScope]: string } = {
+local SANDBOX_DISPLAY: { [types.SandboxScope]: string } = {
 	sandbox = "Sandbox",
 	unsandbox = "Unsandbox",
 }

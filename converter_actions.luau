@@ -2,25 +2,25 @@ local WRAPPER = [[require(game:WaitForChild("native_legacy"))(getfenv());]]
 
 local IGNORE_TAGS = {
 	"nl_dont_sandbox",
-	"nl_ignore"
+	"nl_ignore",
 }
 
 local DONT_SANDBOX_FLAG = "nl_dont_sandbox"
 
 local TARGET_SERVICES = {
-    Workspace = true,
-    Players = true,
-    Lighting = true,
-    ReplicatedStorage = true,
-    ReplicatedFirst = true,
-    ServerScriptService = true,
-    ServerStorage = true,
-    StarterGui = true,
-    StarterPack = true,
-    StarterPlayer = true,
-    Chat = true,
-    Teams = true,
-    SoundService = true,
+	Workspace = true,
+	Players = true,
+	Lighting = true,
+	ReplicatedStorage = true,
+	ReplicatedFirst = true,
+	ServerScriptService = true,
+	ServerStorage = true,
+	StarterGui = true,
+	StarterPack = true,
+	StarterPlayer = true,
+	Chat = true,
+	Teams = true,
+	SoundService = true,
 }
 
 -- the LuaSourceContainer type doesn't include the Source property, so we'll do it ourselves :>
@@ -62,7 +62,6 @@ function converter_actions.revert_script(script: SourceContainer)
 	end
 end
 
-
 local function convert_node(instance: Instance)
 	if
 		can_sandbox(instance)
@@ -79,11 +78,11 @@ local function convert_node(instance: Instance)
 end
 
 function converter_actions.convert_game(data_model: DataModel)
-    for _, service in ipairs(data_model:GetChildren()) do
-        if TARGET_SERVICES[service.Name] then
-            convert_node(service)
-        end
-    end
+	for _, service in ipairs(data_model:GetChildren()) do
+		if TARGET_SERVICES[service.Name] then
+			convert_node(service)
+		end
+	end
 end
 
 function converter_actions.revert_game(data_model: DataModel)
