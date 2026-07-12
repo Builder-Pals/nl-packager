@@ -4,6 +4,8 @@ local actions = require("./converter_actions")
 local serdes = require("./converter_serdes")
 local types = require("./converter_types")
 
+type IndexableInstance = Instance & {}
+
 local PACKAGE_TAG = "nl_package"
 
 local SUPPORTED_ATTRIBUTE_TYPES = {
@@ -92,7 +94,7 @@ local function new_service_pack(service: Instance)
 			and prop.Type.ScriptType
 			and SUPPORTED_ATTRIBUTE_TYPES[prop.Type.ScriptType]
 		then
-			clone:SetAttribute(prop.Name, serdes.ser_property((service :: Instance & {})[prop.Name]))
+			clone:SetAttribute(prop.Name, serdes.ser_property((service :: IndexableInstance)[prop.Name]))
 		end
 	end
 
@@ -263,9 +265,6 @@ local function read(input: Instance): types.Package
 	return package
 end
 
-export type PackageContext = {}
-export type Failure = { ok: false, error: string }
-
 --- Parses a DOM package to a typed package for loading.
 function game_packager.read(package: Instance): types.SomePackage
 	local ok, result = pcall(read, package)
@@ -274,7 +273,9 @@ end
 
 function game_packager.unpack_service(info: types.ServiceInfo)
 	for key, value in info.properties do
-		info.service:SetAttribute(key, value)
+		pcall(function()
+			(info.service :: IndexableInstance)[key] = value
+		end)
 	end
 
 	for _, child in info.content:GetChildren() do
