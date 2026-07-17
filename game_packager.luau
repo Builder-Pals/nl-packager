@@ -185,6 +185,7 @@ local function dump_game_to(destination: Instance)
 end
 
 local game_packager = {}
+game_packager.TARGET_SERVICES = TARGET_SERVICES
 
 --- Creates a sandboxed package of the game that's marketplace ready.
 --- Packges can be read and loaded by *Native Legacy*
@@ -279,7 +280,13 @@ function game_packager.unpack_service(info: types.ServiceInfo)
 	end
 
 	for _, child in info.content:GetChildren() do
-		child.Parent = info.service
+		if child:IsA("StarterPlayerScripts") or child:IsA("StarterPlayer") then
+			for _, sub_child in child:GetChildren() do
+				sub_child.Parent = info.service:FindFirstChild(child.ClassName)
+			end
+		else
+			child.Parent = info.service
+		end
 	end
 end
 
