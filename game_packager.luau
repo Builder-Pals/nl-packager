@@ -252,7 +252,7 @@ local function read(input: Instance): types.Package
 		local service_info: types.ServiceInfo = {
 			service = service,
 			content = child,
-			properties = build_property_table(service),
+			properties = build_property_table(child),
 		}
 
 		table.insert(services, service_info)
@@ -272,11 +272,29 @@ function game_packager.read(package: Instance): types.SomePackage
 	return if ok then result else { read_ok = false, error = tostring(result) }
 end
 
+local defaults = {}
+
 function game_packager.unpack_service(info: types.ServiceInfo)
+	defaults[info.service] = defaults[info.service] or {}
+
+	-- restore defautls
+	for key, value in defaults[info.service] do
+		if info.properties[key] == nil then
+			(info.service :: IndexableInstance)[key] = value
+		end
+	end
+
 	for key, value in info.properties do
-		pcall(function()
+		local old_value
+
+		local ok = pcall(function()
+			old_value = (info.service :: IndexableInstance)[key];
 			(info.service :: IndexableInstance)[key] = value
 		end)
+
+		if ok and not defaults[info.service][key] then
+			defaults[info.service][key] = old_value
+		end
 	end
 
 	for _, child in info.content:GetChildren() do
