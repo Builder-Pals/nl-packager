@@ -293,7 +293,13 @@ function game_packager.unpack_service(info: types.ServiceInfo)
 		end)
 
 		if ok and not defaults[info.service][key] then
-			defaults[info.service][key] = old_value
+			local set_ok, set_err = pcall(function()
+				defaults[info.service][key] = old_value
+			end)
+
+			if not set_ok then
+				warn(`failed to set default for {info.service}.{key}: {set_err}\n🧵{debug.traceback()}`)
+			end
 		end
 	end
 
@@ -303,7 +309,13 @@ function game_packager.unpack_service(info: types.ServiceInfo)
 				sub_child.Parent = info.service:FindFirstChild(child.ClassName)
 			end
 		else
-			child.Parent = info.service
+			local ok, err = pcall(function()
+				child.Parent = info.service
+			end)
+
+			if not ok then
+				warn("failed to reparent", child, "to", info.service, "-", err, "\n🧵", debug.traceback())
+			end
 		end
 	end
 end
